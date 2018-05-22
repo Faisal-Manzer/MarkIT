@@ -11,8 +11,5 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^2.0.0"
-  },
-  "dependencies": {
-    "simplemde": "^1.11.2"
   }
 }
