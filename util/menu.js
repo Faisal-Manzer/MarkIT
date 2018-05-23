@@ -1,23 +1,10 @@
-const path = require('path');
-const ipc = require('electron').ipcRenderer;
-const fs = require('fs');
-const remote = require('electron').remote;
-const main = remote.require('./main.js');
+document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.sidenav');
+    var instances = M.Sidenav.init(elems);
+    var elemsc = document.querySelectorAll('.collapsible');
+    var instancesc = M.Collapsible.init(elemsc);
 
-window.$ = document.querySelector.bind(document);
-window.$$ = document.querySelectorAll.bind(document);
-Element.prototype.$ = Element.prototype.querySelector;
-Element.prototype.$$ = Element.prototype.querySelectorAll;
-
-let simplemde;
-
-function initialSetup(){
-    let sideNav = $('.sidenav');
-    let sideNavIni = M.Sidenav.init(sideNav);
-    let collapsible = $('.collapsible');
-    let collapsibleIni = M.Collapsible.init(collapsible);
-
-    simplemde = new SimpleMDE({
+    var simplemde = new SimpleMDE({
         autoDownloadFontAwesome: false,
         toolbar: [
             "bold",
@@ -57,17 +44,7 @@ function initialSetup(){
         element: document.getElementById("markdown")
     });
     simplemde.codemirror.on("change", function(){
-        $('#mainarea').innerText = simplemde.value();
+        document.querySelector('#mainarea').innerText = simplemde.value();
     });
     simplemde.toggleSideBySide();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initialSetup();
-    let files = main.openFile();
-    console.log(files);
-    let fileName = files[0];
-    fs.readFile(fileName, 'utf-8', function (err, data) {
-        simplemde.value(data);
-    });
 });

@@ -1,120 +1,167 @@
-const {app, BrowserWindow, Menu, globalShortcut} = require('electron')
+const {app, BrowserWindow, Menu, globalShortcut} = require('electron');
 const path = require('path');
 const url = require('url');
-const shell = require('electron').shell;
 const dialog = require('electron').dialog;
-const fs = require('fs');
-// https://docs.google.com/forms/d/e/1FAIpQLSf4j94YYTiFt8huaIARWfSLnmx5mChL9cpEnP2M_QbYKeWMLQ/viewform?usp=pp_url
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let win
 
-function createWindow () {
-    // Create the browser window.
-    win = new BrowserWindow({width: 800, height: 600});
+let win;
 
-    // and load the index.html of the app.
+app.on('ready', () => {
+    setMenus();
+    createWindow();
+    globalShortcut.register('CommandOrControl+Q', () => {
+        // quit();
+    })
+});
+
+app.on('activate', () => {
+   if(win==null)
+       createWindow()
+});
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit()
+}
+});
+
+exports.openFile = () => {
+
+    let files = dialog.showOpenDialog({
+        properties: [
+            'openFile',
+            'openDirectory',
+            'multiSelections'
+        ]
+    });
+    return files;
+};
+
+
+
+function createWindow() {
+
+    win = new BrowserWindow({
+        width: 993,
+        height: 800,
+        minWidth: 993,
+        minHeight: 800,
+        backgroundColor: '#ffffff',
+        show: false
+    });
+
     win.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
-    }))
+    }));
 
-    // Open the DevTools.
-     win.webContents.openDevTools()
+    // inspect element
+    win.webContents.openDevTools();
 
-    // Emitted when the window is closed.
+    win.once('ready-to-show', () => {
+        win.show()
+    });
+
     win.on('closed', () => {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
-        win = null
-    })
+        // make a want to exit dialog here
+        win = null;
+    });
 
-    var menu = Menu.buildFromTemplate([
+}
+
+function setMenus(){
+    let menu = Menu.buildFromTemplate([
         {
             label: "MarkIT",
             submenu: [
                 {
-                    label: "Preferences"
-                },
-                {
-                    label: "Exit",
+                    label: "Setting",
                     click(){
-                        app.quit()
-                    }
-                }
-            ]
-        },
-        {
-            label: "Menu",
-            submenu: [
-                {
-                    label: "Adjust Notification"
-                },
-                {
-                    label: "CoinMarketCap",
-                    click(){
-                        shell.openExternal('http://coinmarketcap.com')
+                        // setting();
                     }
                 },
                 {
                     type: 'separator'
                 },
                 {
-                    label: "Open",
+                    label: "About MarkIT",
                     click(){
-                        dialog.showOpenDialog({ filters: [
-
-                                { name: 'text', extensions: ['txt'] }
-
-                            ]}, function (fileNames) {
-
-                            if (fileNames === undefined) return;
-
-                            var fileName = fileNames[0];
-                            console.log(fileName);
-                            console.log("ok");
-                            fs.readFile(fileName, 'utf-8', function (err, data) {
-
-
-                            });
-
-                        });
+                        // about();
+                    }
+                },
+                {
+                    label: "About Faisal",
+                    click(){
+                        // aboutFaisal();
+                    }
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: 'Quit',
+                    click(){
+                        // quit();
+                    }
+                }
+            ]
+        },
+        {
+            label: "File",
+            submenu: [
+                {
+                    label: 'New Window',
+                    click(){
+                        createWindow();
+                    }
+                },
+                {
+                    label: 'Close Window',
+                    click(){
+                        let currWin = BrowserWindow.getFocusedWindow();
+                        if(currWin !== null)
+                            currWin.close();
+                    }
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: 'Add New Project',
+                    click(){
+                        // addProject();
+                    }
+                },
+                {
+                    label: 'Close All Projects',
+                    click(){
+                        // closeAllProjects();
+                    }
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                  label: 'Open File',
+                  click(){
+                      openFile();
+                  }
+                },
+                {
+                    label: 'New File',
+                    click(){
+                        // newFile();
+                    }
+                },
+                {
+                    label: 'Save',
+                    click(){
+                        // save();
                     }
                 }
             ]
         }
-    ])
+    ]);
 
-    globalShortcut.register('CommandOrControl+Q', () => {
-        app.quit();
-    })
-
-    Menu.setApplicationMenu(menu)
+    Menu.setApplicationMenu(menu);
 }
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
-
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
-})
-
-app.on('activate', () => {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-        createWindow()
-    }
-})
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
