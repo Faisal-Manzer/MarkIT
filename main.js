@@ -1,5 +1,5 @@
 'use strict';
-const {app, BrowserWindow, Menu, globalShortcut} = require('electron');
+const {app, BrowserWindow, Menu, globalShortcut, remote} = require('electron');
 const path = require('path');
 const url = require('url');
 const dialog = require('electron').dialog;
@@ -26,18 +26,6 @@ app.on('window-all-closed', () => {
         app.quit()
 }
 });
-
-exports.openFile = () => {
-
-    let files = dialog.showOpenDialog({
-        properties: [
-            'openFile',
-            'openDirectory',
-            'multiSelections'
-        ]
-    });
-    return files;
-};
 
 
 
@@ -145,9 +133,9 @@ function setMenus(){
                     type: 'separator'
                 },
                 {
-                  label: 'Open File',
+                  label: 'Open',
                   click(){
-                      openFile();
+                      win.webContents.send('open-new-file', '');
                   }
                 },
                 {
