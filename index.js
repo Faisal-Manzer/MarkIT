@@ -9,7 +9,8 @@ window.$$ = document.querySelectorAll.bind(document);
 Element.prototype.$ = Element.prototype.querySelector;
 Element.prototype.$$ = Element.prototype.querySelectorAll;
 
-let simplemde;
+let simplemde = null;
+let workingFile = null;
 
 function initialSetup(){
     let sideNav = $('.sidenav');
@@ -59,6 +60,9 @@ function initialSetup(){
     simplemde.codemirror.on("change", function(){
         $('#mainarea').innerText = simplemde.value();
     });
+    simplemde.codemirror.on("change", function(){
+       fileOnChange();
+    });
     simplemde.toggleSideBySide();
 }
 
@@ -67,7 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let files = main.openFile();
     console.log(files);
     let fileName = files[0];
+    workingFile = fileName;
     fs.readFile(fileName, 'utf-8', function (err, data) {
         simplemde.value(data);
     });
 });
+
+function fileOnChange() {
+    $('#mainarea').innerText = simplemde.value();
+    if(workingFile !== null){
+        fs.writeFile(workingFile, simplemde.value(), (err) => {
+            if(err !== null)
+                alert('Error in saving file: ' + err);
+        });
+    }
+}

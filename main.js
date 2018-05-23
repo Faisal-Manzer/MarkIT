@@ -1,7 +1,10 @@
+'use strict';
 const {app, BrowserWindow, Menu, globalShortcut} = require('electron');
 const path = require('path');
 const url = require('url');
 const dialog = require('electron').dialog;
+
+require('electron-reload')(__dirname);
 
 let win;
 
@@ -9,7 +12,7 @@ app.on('ready', () => {
     setMenus();
     createWindow();
     globalShortcut.register('CommandOrControl+Q', () => {
-        // quit();
+        app.quit();
     })
 });
 
