@@ -85,7 +85,7 @@
 <body>
 <div id="sidenav">
     <ul id="slide-out" class="sidenav sidenav-fixed">
-        <li><a href="#!"><i class="material-icons">insert_drive_file</i>First Sidebar Link</a></li>
+        <li><a href="#!" id="saveIII"><i class="material-icons">insert_drive_file</i>First Sidebar Link</a></li>
         <li><a href="#!"><i class="material-icons">insert_drive_file</i>Second Sidebar Link</a></li>
         <li class="">
             <ul class="collapsible expandable">
@@ -136,6 +136,7 @@
 <main>
     <textarea id="markdown">
     </textarea>
+    <textarea id="mainarea" style="display: none"></textarea>
 </main>
 <!--JavaScript at end of body for optimized loading-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
@@ -186,8 +187,17 @@
             autofocus: true,
             element: document.getElementById("markdown")
         });
+        simplemde.codemirror.on("change", function(){
+            console.log(simplemde.value());
+            document.querySelector('#mainarea').innerText = simplemde.value();
+        });
         simplemde.toggleSideBySide();
-        
+        document.querySelector('#saveIII').addEventListener('click', saveIT);
+
+        function saveIT() {
+            document.getElementById("mainarea").innerText = "Fifth Avenue, New York City";
+            console.log(simplemde.value());
+        }
     });
 </script>
 </body>
