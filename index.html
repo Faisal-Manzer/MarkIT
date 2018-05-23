@@ -1,56 +1,194 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--Import Google Icon Font-->
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    <link rel="stylesheet" href="assets/simplemde/simplemde.css">
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css">
-    <link rel="stylesheet" href="assets/simplemde/simplemde.min.css">
-    <link rel="stylesheet" href="assets/css/markit.css">
-    <title>MarkIT</title>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        .collapsible-body{
+            margin-left: 10px !important;
+            box-sizing: border-box;
+        }
+        .sidenav .collapsible-header, .sidenav.fixed .collapsible-header{
+            box-sizing: border-box;
+            padding: 0 16px;
+        }
+        .sidenav li>a>i, .sidenav li>a>[class^="mdi-"], .sidenav li>a li>a>[class*="mdi-"], .sidenav li>a>i.material-icons{
+            margin: 0 4px 0 0;
+        }
+        .sidenav li a{
+            line-height: 30px !important;
+            height: 30px !important;
+            padding: 0 16px;
+        }
+        .sidenav li a>i{
+            line-height: 30px !important;
+            height: 30px !important;
+        }
+
+        html {
+            padding-left: 300px;
+        }
+
+        .CodeMirror-fullscreen {
+            position: relative !important;
+            top: 50px;
+            height: calc(100vh - 50px) !important;
+        }
+        .editor-preview-side{
+            width: calc(50% - 150px);
+            top: 50px;
+        }
+        .editor-toolbar{
+            padding-left: 300px;
+
+        }
+        .editor-toolbar .fa-arrows-alt{
+            display: none;
+        }
+        main{
+            font-family: arial;
+        }
+        /*.fullscreen{*/
+        /*padding-left: 300px !important;*/
+        /*}*/
+
+        /*.CodeMirror.cm-s-paper.CodeMirror-wrap.CodeMirror-sided.CodeMirror-fullscreen{*/
+        /*padding-left: 300px;*/
+        /*box-sizing: border-box;*/
+        /*position: absolute !important;*/
+        /*}*/
+        /*.editor-preview-side.editor-preview-active-side{*/
+        /*padding-left: 300px;*/
+        /*position: absolute !important;*/
+        /*}*/
+        @media only screen and (max-width : 992px) {
+            html, .editor-toolbar {
+                padding-left: 0;
+            }
+            .editor-preview-side{
+                width: 50%;
+            }
+            .CodeMirror-fullscreen{
+                position: fixed;
+            }
+        }
+    </style>
 </head>
 <body>
-<textarea id="markdown"></textarea>
-<script src="assets/simplemde/simplemde.min.js"></script>
+<div id="sidenav">
+    <ul id="slide-out" class="sidenav sidenav-fixed">
+        <li><a href="#!"><i class="material-icons">insert_drive_file</i>First Sidebar Link</a></li>
+        <li><a href="#!"><i class="material-icons">insert_drive_file</i>Second Sidebar Link</a></li>
+        <li class="">
+            <ul class="collapsible expandable">
+                <li>
+                    <a class="collapsible-header">Dropdown<i class="material-icons">folder</i></a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li><a href="#!"><i class="material-icons">insert_drive_file</i>First</a></li>
+                            <li>
+                                <ul class="collapsible expandable">
+                                    <li>
+                                        <a class="collapsible-header">Dropdown<i class="material-icons">folder</i></a>
+                                        <div class="collapsible-body">
+                                            <ul>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>First</a></li>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>Second</a></li>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>Third</a></li>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>Fourth</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><a href="#!"><i class="material-icons">insert_drive_file</i>Third</a></li>
+                            <li><a href="#!"><i class="material-icons">insert_drive_file</i>Fourth</a></li>
+                            <li>
+                                <ul class="collapsible expandable">
+                                    <li>
+                                        <a class="collapsible-header">Dropdown<i class="material-icons">folder</i></a>
+                                        <div class="collapsible-body">
+                                            <ul>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>First</a></li>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>Second</a></li>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>Third</a></li>
+                                                <li><a href="#!"><i class="material-icons">insert_drive_file</i>Fourth</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<main>
+    <textarea id="markdown">
+    </textarea>
+</main>
+<!--JavaScript at end of body for optimized loading-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+<script src="assets/simplemde/simplemde.js"></script>
 <script>
-    var simplemde = new SimpleMDE({
-        autoDownloadFontAwesome: true,
-        toolbar: [
-            "bold",
-            "italic",
-            "strikethrough",
-            {
-                name: "Heading",
-                action: SimpleMDE.toggleHeadingSmaller,
-                className: "fa fa-heading",
-                title: "Heading"
-            },
-            "|",
-            "code",
-            "quote",
-            "|",
-            "unordered-list",
-            "ordered-list",
-            "|",
-            "link",
-            {
-                name: "Image",
-                action: SimpleMDE.drawImage,
-                className: "fa fa-image",
-                title: "Image"
-            },
-            "table",
-            "horizontal-rule",
-            "|",
-            "preview",
-            "side-by-side"
-        ],
-        element: document.getElementById("markdown")
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.sidenav');
+        var instances = M.Sidenav.init(elems);
+        var elemsc = document.querySelectorAll('.collapsible');
+        var instancesc = M.Collapsible.init(elemsc);
+
+        var simplemde = new SimpleMDE({
+            autoDownloadFontAwesome: false,
+            toolbar: [
+                "bold",
+                "italic",
+                "strikethrough",
+                {
+                    name: "Heading",
+                    action: SimpleMDE.toggleHeadingSmaller,
+                    className: "fa fa-heading",
+                    title: "Heading"
+                },
+                "|",
+                "code",
+                "quote",
+                "|",
+                "unordered-list",
+                "ordered-list",
+                "|",
+                "link",
+                {
+                    name: "Image",
+                    action: SimpleMDE.drawImage,
+                    className: "fa fa-image",
+                    title: "Image"
+                },
+                "table",
+                "horizontal-rule",
+                "|",
+                "preview",
+                "side-by-side",
+                "fullscreen"
+
+            ],
+            forceSync: true,
+            spellChecker: false,
+            autofocus: true,
+            element: document.getElementById("markdown")
+        });
+        simplemde.toggleSideBySide();
+        
     });
-    simplemde.toggleSideBySide();
-    simplemde.toggleFullScreen();
-    simplemde.togglePreview();
 </script>
 </body>
 </html>

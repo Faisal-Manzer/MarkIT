@@ -4,7 +4,7 @@ const url = require('url');
 const shell = require('electron').shell;
 const dialog = require('electron').dialog;
 const fs = require('fs');
-
+// https://docs.google.com/forms/d/e/1FAIpQLSf4j94YYTiFt8huaIARWfSLnmx5mChL9cpEnP2M_QbYKeWMLQ/viewform?usp=pp_url
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
