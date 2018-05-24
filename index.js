@@ -97,8 +97,8 @@ let openFile = () => {
     }
 
     showFile();
-    M.Collapsible.init($$('.collapsible'));
-
+    sidenav.setAttribute('data-child', 'false');
+    folderStructure(workingFolder, sidenav);
 };
 
 let showFile = () => {
@@ -145,16 +145,24 @@ function folderStructure(filename, parent) {
 */
 
 function folderStructure(filename, parent) {
-    let stats = fs.lstatSync(filename);
-    let info = {
-        path: filename,
-        name: path.basename(filename)
-    };
-    info.type = (stats.isDirectory())? 'folder' : ((stats.isFile())? 'file' : 'unknown');
-    if(info.type === 'file'){
-        addFileToFolderStructure(info, parent);
-    } else if(info.type === 'folder'){
-        addFolderToFolderStructure(info, parent)
+    if(parent.getAttribute('data-child') === ('false' || null || undefined)) {
+        parent.setAttribute('data-child', 'true')
+        fs.readdirSync(filename).map(function (child) {
+            let filePath = filename + '/' + child;
+            let stats = fs.lstatSync(filePath);
+            let info = {
+                path: filePath,
+                stats: fs.lstatSync(filePath),
+                name: path.basename(filePath),
+                type: (stats.isFile()) ? 'file' : ((stats.isDirectory()) ? 'folder' : null)
+            };
+            if (info.type === 'file')
+                addFileToFolderStructure(info, parent);
+            if (info.type === 'folder') {
+                addFolderToFolderStructure(info, parent);
+            }
+        });
+        M.Collapsible.init(parent.parentNode.parentNode.parentNode);
     }
 }
 
@@ -199,6 +207,8 @@ function addFolderToFolderStructure(structure, parent) {
     let eleHeader = document.createElement('a');
     eleUlLi.appendChild(eleHeader);
 
+    eleHeader.setAttribute('data-path', structure.path);
+
     eleHeader.classList.add('collapsible-header');
 
     eleHeader.innerText = structure.name;
@@ -217,8 +227,11 @@ function addFolderToFolderStructure(structure, parent) {
 
     let eleBodyUl = document.createElement('ul');
     eleBody.appendChild(eleBodyUl);
+    eleBodyUl.setAttribute('data-child', 'false');
 
-    return eleHeader;
+    eleHeader.onclick = () => {
+        folderStructure(structure.path, eleBodyUl);
+    };
 }
 
 function selectFile(ele) {
