@@ -15,50 +15,7 @@ const sidenav = $('.sidenav');
 
 function initialSetup(){
     M.Sidenav.init(sidenav);
-    simplemde = new SimpleMDE({
-        autoDownloadFontAwesome: false,
-        toolbar: [
-            "bold",
-            "italic",
-            "strikethrough",
-            {
-                name: "Heading",
-                action: SimpleMDE.toggleHeadingSmaller,
-                className: "fa fa-heading",
-                title: "Heading"
-            },
-            "|",
-            "code",
-            "quote",
-            "|",
-            "unordered-list",
-            "ordered-list",
-            "|",
-            "link",
-            {
-                name: "Image",
-                action: SimpleMDE.drawImage,
-                className: "fa fa-image",
-                title: "Image"
-            },
-            "table",
-            "horizontal-rule",
-            "|",
-            "preview",
-            "side-by-side",
-            "fullscreen"
-
-        ],
-        forceSync: true,
-        spellChecker: false,
-        autofocus: true,
-        element: document.getElementById("markdown")
-    });
-    simplemde.codemirror.on("change", function(){
-        $('#mainarea').innerText = simplemde.value();
-    });
-    simplemde.codemirror.on("change", fileOnChange);
-    simplemde.toggleSideBySide();
+    simplemdeInit();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -86,6 +43,8 @@ let openFile = () => {
         workingFolder = null;
         workingFile = null;
 
+
+
         if(fs.lstatSync(selectedPath).isDirectory()){
             workingFolder = selectedPath;
         }
@@ -98,11 +57,18 @@ let openFile = () => {
 
     showFile();
     sidenav.setAttribute('data-child', 'false');
-    folderStructure(workingFolder, sidenav);
+    let stats = fs.lstatSync(workingFolder);
+    addFolderToFolderStructure({
+        path: workingFolder,
+        name: path.basename(workingFolder),
+        type: (stats.isFile()) ? 'file' : ((stats.isDirectory()) ? 'folder' : null)
+    }, sidenav);
 };
 
 let showFile = () => {
     if(workingFile){
+        history.pushState(path.join('file:/', workingFolder), null);
+        console.log(window.location.href);
         fs.readFile(workingFile, 'utf-8', function (err, data) {
             if(!err)
                 simplemde.value(data);
@@ -111,8 +77,15 @@ let showFile = () => {
 };
 
 function fileOnChange() {
+    console.log(`${__dirname}`);
     $('#mainarea').innerText = simplemde.value();
     if(workingFile !== null){
+        let allImg = $$('.editor-preview-side img');
+        for(let i=0;i<allImg.length;i++){
+            console.log('pr');
+            let src = allImg[i].src;
+            src.replace(`${__dirname}/index.html`,workingFolder);
+        }
         fs.writeFile(workingFile, simplemde.value(), (err) => {
             if(err)
                 alert('Error in saving file: ' + err);
@@ -152,7 +125,6 @@ function folderStructure(filename, parent) {
             let stats = fs.lstatSync(filePath);
             let info = {
                 path: filePath,
-                stats: fs.lstatSync(filePath),
                 name: path.basename(filePath),
                 type: (stats.isFile()) ? 'file' : ((stats.isDirectory()) ? 'folder' : null)
             };
@@ -238,4 +210,51 @@ function selectFile(ele) {
     workingFolder = path.basename(ele.getAttribute('data-path'));
     workingFile = ele.getAttribute('data-path');
     showFile();
+}
+
+function simplemdeInit() {
+    simplemde = new SimpleMDE({
+        autoDownloadFontAwesome: false,
+        toolbar: [
+            "bold",
+            "italic",
+            "strikethrough",
+            {
+                name: "Heading",
+                action: SimpleMDE.toggleHeadingSmaller,
+                className: "fa fa-heading",
+                title: "Heading"
+            },
+            "|",
+            "code",
+            "quote",
+            "|",
+            "unordered-list",
+            "ordered-list",
+            "|",
+            "link",
+            {
+                name: "Image",
+                action: SimpleMDE.drawImage,
+                className: "fa fa-image",
+                title: "Image"
+            },
+            "table",
+            "horizontal-rule",
+            "|",
+            "preview",
+            "side-by-side",
+            "fullscreen"
+
+        ],
+        forceSync: true,
+        spellChecker: false,
+        autofocus: true,
+        element: document.getElementById("markdown")
+    });
+    simplemde.codemirror.on("change", function(){
+        $('#mainarea').innerText = simplemde.value();
+    });
+    simplemde.codemirror.on("change", fileOnChange);
+    simplemde.toggleSideBySide();
 }

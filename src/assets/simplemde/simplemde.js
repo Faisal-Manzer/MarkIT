@@ -13742,7 +13742,16 @@ Renderer.prototype.link = function(href, title, text) {
       return '';
     }
   }
-  var out = '<a href="' + href + '"';
+  console.log('ca: '+href);
+    // ---------------------
+    // faisal's editing
+    // ---------------------
+    let x = href.match(/^#/);
+    let placeHolder = '#!';
+    if(x)
+        placeHolder = href;
+
+  var out = '<a href="' + placeHolder + '"';
   if (title) {
     out += ' title="' + title + '"';
   }
@@ -13751,7 +13760,14 @@ Renderer.prototype.link = function(href, title, text) {
 };
 
 Renderer.prototype.image = function(href, title, text) {
-  var out = '<img src="' + href + '" alt="' + text + '"';
+    // ---------------------
+    // faisal's editing
+    // ---------------------
+    let x = href.match(/^https?:/);
+    let placeHolder = workingFolder + '/';
+    if(x)
+        placeHolder = '';
+  var out = '<img src="' + placeHolder + href + '" alt="' + text + '"';
   if (title) {
     out += ' title="' + title + '"';
   }
