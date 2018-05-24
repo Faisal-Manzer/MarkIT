@@ -2,7 +2,6 @@ const path = require('path');
 const ipc = require('electron').ipcRenderer;
 const fs = require('fs');
 const dialog = require('electron').remote.dialog;
-
 window.$ = document.querySelector.bind(document);
 window.$$ = document.querySelectorAll.bind(document);
 Element.prototype.$ = Element.prototype.querySelector;
@@ -10,15 +9,12 @@ Element.prototype.$$ = Element.prototype.querySelectorAll;
 
 let simplemde = null;
 let workingFile = null;
-let workingFoler = null;
-let folderStucture = null;
+let workingFolder = null;
 
-let sidenav = $('.sidenav');
+const sidenav = $('.sidenav');
 
 function initialSetup(){
-    let sideNav = $('.sidenav');
-    let sideNavIni = M.Sidenav.init(sideNav);
-
+    M.Sidenav.init(sidenav);
     simplemde = new SimpleMDE({
         autoDownloadFontAwesome: false,
         toolbar: [
@@ -61,9 +57,7 @@ function initialSetup(){
     simplemde.codemirror.on("change", function(){
         $('#mainarea').innerText = simplemde.value();
     });
-    simplemde.codemirror.on("change", function(){
-       fileOnChange();
-    });
+    simplemde.codemirror.on("change", fileOnChange);
     simplemde.toggleSideBySide();
 }
 
@@ -71,21 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initialSetup();
 });
 
-function fileOnChange() {
-    $('#mainarea').innerText = simplemde.value();
-    if(workingFile !== null){
-        fs.writeFile(workingFile, simplemde.value(), (err) => {
-            if(err !== null)
-                alert('Error in saving file: ' + err);
-        });
-    }
-}
+ipc.on('open-new-file', () => {openFile()});
 
-ipc.on('open-new-file', (e, args) => {
-    openFile();
-});
+ipc.on('winFocusChanged', () => {showFile()});
 
-const openFile = () => {
+let openFile = () => {
     let selectedPath = dialog.showOpenDialog({
         properties: [
             'openFile',
@@ -96,45 +80,48 @@ const openFile = () => {
             'promptToCreate'
         ]
     });
-
-    if(selectedPath !== null){
+    if(selectedPath){
         selectedPath = selectedPath[0];
 
-        workingFoler = null;
+        workingFolder = null;
         workingFile = null;
-        folderStucture = null;
 
         if(fs.lstatSync(selectedPath).isDirectory()){
-            workingFoler = selectedPath;
+            workingFolder = selectedPath;
         }
 
         if(fs.lstatSync(selectedPath).isFile()){
-            workingFoler = path.dirname(selectedPath);
-            workingFile = path.filename(selectedPath);
+            workingFolder = path.dirname(selectedPath);
+            workingFile = selectedPath;
         }
-
-        folderStucture = dirTree(workingFoler);
-        //console.log(folderStucture);
     }
 
     showFile();
-    $('#folderloading').classList.remove('hide');
-    showFolderStructure(folderStucture.children, $('.sidenav-fixed'));
-    $('#folderloading').classList.add('hide');
-    let collapsible = $$('.collapsible');
-    let collapsibleIni = M.Collapsible.init(collapsible);
+    M.Collapsible.init($$('.collapsible'));
 
 };
 
 let showFile = () => {
-    if(workingFile !== null){
+    if(workingFile){
         fs.readFile(workingFile, 'utf-8', function (err, data) {
-            simplemde.value(data);
+            if(!err)
+                simplemde.value(data);
         });
     }
 };
 
-function dirTree(filename) {
+function fileOnChange() {
+    $('#mainarea').innerText = simplemde.value();
+    if(workingFile !== null){
+        fs.writeFile(workingFile, simplemde.value(), (err) => {
+            if(err)
+                alert('Error in saving file: ' + err);
+        });
+    }
+}
+
+/*
+function folderStructure(filename, parent) {
     let stats = fs.lstatSync(filename),
         info = {
             path: filename,
@@ -143,82 +130,99 @@ function dirTree(filename) {
 
     if (stats.isDirectory()) {
         info.type = "folder";
-        info.children = fs.readdirSync(filename).map(function(child) {
-            return dirTree(filename + '/' + child);
+        let secParent = addFolderToFolderStructure(info, parent);
+        secParent.onclick = (e) => {
+          folderStructure(filename, secParent);
+        };
+        fs.readdirSync(filename).map(function(child) {
+            folderStructure(filename + '/' + child, secParent);
         });
-    } else {
-        // Assuming it's a file. In real life it could be a symlink or
-        // something else!
-        if(stats.isFile())
-            info.type = "file";
-        else
-            info.type = "none";
+    } else if(stats.isFile()) {
+        info.type = 'file';
+        addFileToFolderStructure(info, parent);
     }
+}
+*/
 
-    return info;
+function folderStructure(filename, parent) {
+    let stats = fs.lstatSync(filename);
+    let info = {
+        path: filename,
+        name: path.basename(filename)
+    };
+    info.type = (stats.isDirectory())? 'folder' : ((stats.isFile())? 'file' : 'unknown');
+    if(info.type === 'file'){
+        addFileToFolderStructure(info, parent);
+    } else if(info.type === 'folder'){
+        addFolderToFolderStructure(info, parent)
+    }
 }
 
-let showFolderStructure = (structure, parent) => {
-    if(structure !== null){
-        for(let i=0; i<structure.length; i++){
-            let stru = structure[i];
-            if(stru.type === 'file'){
-                let ele = document.createElement('li');
-                parent.appendChild(ele);
+function addFileToFolderStructure(structure, parent) {
+    let ele = document.createElement('li');
+    parent.appendChild(ele);
 
-                let eleAnc = document.createElement('a');
-                ele.appendChild(eleAnc);
+    let eleAnc = document.createElement('a');
+    ele.appendChild(eleAnc);
 
-                eleAnc.href = '#!';
+    eleAnc.href = '#!';
+    eleAnc.setAttribute('data-path', structure.path);
+    eleAnc.onclick = (e) => {
+        selectFile(eleAnc);
+    };
 
-                let eleIcon = document.createElement('i');
-                eleAnc.appendChild(eleIcon);
+    let eleIcon = document.createElement('i');
+    eleAnc.appendChild(eleIcon);
 
-                eleIcon.classList.add('material-icons');
-                eleIcon.innerText = 'insert_drive_file';
+    eleIcon.classList.add('material-icons');
+    eleIcon.innerText = 'insert_drive_file';
 
-                let eleSpan = document.createElement('span');
-                eleAnc.appendChild(eleSpan);
+    let eleSpan = document.createElement('span');
+    eleAnc.appendChild(eleSpan);
 
-                eleSpan.innerText = stru.name;
+    eleSpan.innerText = structure.name;
+}
 
-            } else if(stru.type === 'folder'){
-                let ele = document.createElement('li');
-                parent.appendChild(ele);
+function addFolderToFolderStructure(structure, parent) {
+    let ele = document.createElement('li');
+    parent.appendChild(ele);
 
-                let eleUl = document.createElement('ul');
-                ele.appendChild(eleUl);
+    let eleUl = document.createElement('ul');
+    ele.appendChild(eleUl);
 
-                eleUl.classList.add('collapsible');
-                eleUl.classList.add('expandable');
+    eleUl.classList.add('collapsible');
+    eleUl.classList.add('expandable');
 
-                let eleUlLi = document.createElement('li');
-                eleUl.appendChild(eleUlLi);
+    let eleUlLi = document.createElement('li');
+    eleUl.appendChild(eleUlLi);
 
-                let eleHeader = document.createElement('a');
-                eleUlLi.appendChild(eleHeader);
+    let eleHeader = document.createElement('a');
+    eleUlLi.appendChild(eleHeader);
 
-                eleHeader.classList.add('collapsible-header');
+    eleHeader.classList.add('collapsible-header');
 
-                eleHeader.innerText = stru.name;
+    eleHeader.innerText = structure.name;
 
-                let eleHeaderIcon = document.createElement('i');
-                eleHeader.appendChild(eleHeaderIcon);
+    let eleHeaderIcon = document.createElement('i');
+    eleHeader.appendChild(eleHeaderIcon);
 
-                eleHeaderIcon.classList.add('material-icons');
-                eleHeaderIcon.innerText = 'folder';
+    eleHeaderIcon.classList.add('material-icons');
+    eleHeaderIcon.innerText = 'folder';
 
 
-                let eleBody = document.createElement('div');
-                eleUlLi.appendChild(eleBody);
+    let eleBody = document.createElement('div');
+    eleUlLi.appendChild(eleBody);
 
-                eleBody.classList.add('collapsible-body');
+    eleBody.classList.add('collapsible-body');
 
-                let eleBodyUl = document.createElement('ul');
-                eleBody.appendChild(eleBodyUl);
+    let eleBodyUl = document.createElement('ul');
+    eleBody.appendChild(eleBodyUl);
 
-                showFolderStructure(stru.children, eleBodyUl);
-            }
-        }
-    }
-};
+    return eleHeader;
+}
+
+function selectFile(ele) {
+    workingFolder = path.basename(ele.getAttribute('data-path'));
+    workingFile = ele.getAttribute('data-path');
+    showFile();
+}

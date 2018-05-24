@@ -58,6 +58,9 @@ function createWindow() {
         win = null;
     });
 
+    win.on('focus', () => {
+        win.webContents.send('winFocusChanged', '');
+    });
 }
 
 function setMenus(){
