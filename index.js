@@ -67,8 +67,6 @@ let openFile = () => {
 
 let showFile = () => {
     if(workingFile){
-        history.pushState(path.join('file:/', workingFolder), null);
-        console.log(window.location.href);
         fs.readFile(workingFile, 'utf-8', function (err, data) {
             if(!err)
                 simplemde.value(data);
@@ -77,7 +75,6 @@ let showFile = () => {
 };
 
 function fileOnChange() {
-    console.log(`${__dirname}`);
     $('#mainarea').innerText = simplemde.value();
     if(workingFile !== null){
         let allImg = $$('.editor-preview-side img');
@@ -207,7 +204,7 @@ function addFolderToFolderStructure(structure, parent) {
 }
 
 function selectFile(ele) {
-    workingFolder = path.basename(ele.getAttribute('data-path'));
+    workingFolder = path.dirname(ele.getAttribute('data-path'));
     workingFile = ele.getAttribute('data-path');
     showFile();
 }
@@ -249,7 +246,7 @@ function simplemdeInit() {
         ],
         forceSync: true,
         spellChecker: false,
-        autofocus: true,
+        autofocus: false,
         element: document.getElementById("markdown")
     });
     simplemde.codemirror.on("change", function(){

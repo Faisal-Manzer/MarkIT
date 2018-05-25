@@ -13742,7 +13742,6 @@ Renderer.prototype.link = function(href, title, text) {
       return '';
     }
   }
-  console.log('ca: '+href);
     // ---------------------
     // faisal's editing
     // ---------------------
