@@ -31,7 +31,6 @@ let openFile = () => {
         properties: [
             'openFile',
             'openDirectory',
-            'multiSelections',
             'showHiddenFiles',
             'createDirectory',
             'promptToCreate'
