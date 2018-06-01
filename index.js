@@ -7,15 +7,16 @@ window.$$ = document.querySelectorAll.bind(document);
 Element.prototype.$ = Element.prototype.querySelector;
 Element.prototype.$$ = Element.prototype.querySelectorAll;
 
-let simplemde = null;
+let mde = null;
 let workingFile = null;
 let workingFolder = null;
 
 const sidenav = $('.sidenav');
+let sidenavIni = null;
 
 function initialSetup(){
-    M.Sidenav.init(sidenav);
-    simplemdeInit();
+    sidenavIni = M.Sidenav.init(sidenav);
+    mdeInit();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -66,15 +67,17 @@ let openFile = () => {
 
 let showFile = () => {
     if(workingFile){
+        let ext = path.extname(workingFile);
+        if(ext)
         fs.readFile(workingFile, 'utf-8', function (err, data) {
             if(!err)
-                simplemde.value(data);
+                mde.value(data);
         });
     }
 };
 
 function fileOnChange() {
-    $('#mainarea').innerText = simplemde.value();
+    $('#mainarea').innerText = mde.value();
     if(workingFile !== null){
         let allImg = $$('.editor-preview-side img');
         for(let i=0;i<allImg.length;i++){
@@ -82,36 +85,12 @@ function fileOnChange() {
             let src = allImg[i].src;
             src.replace(`${__dirname}/index.html`,workingFolder);
         }
-        fs.writeFile(workingFile, simplemde.value(), (err) => {
+        fs.writeFile(workingFile, mde.value(), (err) => {
             if(err)
                 alert('Error in saving file: ' + err);
         });
     }
 }
-
-/*
-function folderStructure(filename, parent) {
-    let stats = fs.lstatSync(filename),
-        info = {
-            path: filename,
-            name: path.basename(filename)
-        };
-
-    if (stats.isDirectory()) {
-        info.type = "folder";
-        let secParent = addFolderToFolderStructure(info, parent);
-        secParent.onclick = (e) => {
-          folderStructure(filename, secParent);
-        };
-        fs.readdirSync(filename).map(function(child) {
-            folderStructure(filename + '/' + child, secParent);
-        });
-    } else if(stats.isFile()) {
-        info.type = 'file';
-        addFileToFolderStructure(info, parent);
-    }
-}
-*/
 
 function folderStructure(filename, parent) {
     if(parent.getAttribute('data-child') === ('false' || null || undefined)) {
@@ -142,6 +121,7 @@ function addFileToFolderStructure(structure, parent) {
     ele.appendChild(eleAnc);
 
     eleAnc.href = '#!';
+    eleAnc.setAttribute('draggable', 'false');
     eleAnc.setAttribute('data-path', structure.path);
     eleAnc.onclick = (e) => {
         selectFile(eleAnc);
@@ -156,7 +136,7 @@ function addFileToFolderStructure(structure, parent) {
     let eleSpan = document.createElement('span');
     eleAnc.appendChild(eleSpan);
 
-    eleSpan.innerText = structure.name;
+    eleSpan.innerText = structure.name.replace(/ +/g, '');
 }
 
 function addFolderToFolderStructure(structure, parent) {
@@ -208,10 +188,25 @@ function selectFile(ele) {
     showFile();
 }
 
-function simplemdeInit() {
-    simplemde = new SimpleMDE({
+function mdeInit() {
+    mde = new SimpleMDE({
         autoDownloadFontAwesome: false,
         toolbar: [
+            {
+                name: "folder structure",
+                action: () => {
+                    alert("qq")
+                },
+                className: "fas fa-sitemap active"
+            },
+            {
+                name: "theme",
+                action: () => {
+                    alert('change theme');
+                },
+                className: "fas fa-adjust"
+            },
+            "|",
             "bold",
             "italic",
             "strikethrough",
@@ -246,11 +241,20 @@ function simplemdeInit() {
         forceSync: true,
         spellChecker: false,
         autofocus: false,
+        renderingConfig: {
+            codeSyntaxHighlighting: true
+        },
         element: document.getElementById("markdown")
     });
-    simplemde.codemirror.on("change", function(){
-        $('#mainarea').innerText = simplemde.value();
+    mde.codemirror.on("change", function(){
+        $('#mainarea').innerText = mde.value();
     });
-    simplemde.codemirror.on("change", fileOnChange);
-    simplemde.toggleSideBySide();
+    // $('.fixed-action-btn').onclick = () => {
+    //     mde.codemirror.setOption('theme', 'paper');
+    //     document.body.style.padding = '0';
+    //     $('.editor-preview-side').style.width = '50%';
+    //     sidenavIni.close();
+    // };
+    mde.codemirror.on("change", fileOnChange);
+    mde.toggleSideBySide();
 }

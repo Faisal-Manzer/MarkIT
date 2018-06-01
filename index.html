@@ -8,10 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
     <link rel="stylesheet" href="src/assets/simplemde/simplemde.css">
     <link rel="stylesheet" href="src/assets/css/fontawesome-all.min.css">
-
+    <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <style>
+        body{
+            height: 100vh;
+            -webkit-filter: invert(80%);
+        }
         .collapsible-body{
             margin-left: 10px !important;
             box-sizing: border-box;
@@ -32,52 +37,76 @@
             line-height: 30px !important;
             height: 30px !important;
         }
-
         .sidenav{
             overflow-x: scroll;
-            top: 50px;
         }
-
-        html {
+        .sidenav{
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+        }
+        body {
             padding-left: 300px;
             -webkit-app-region: drag;
+            box-sizing: border-box;
         }
-
         .CodeMirror-fullscreen {
             position: relative !important;
             top: 50px;
             height: calc(100vh - 50px) !important;
+            padding: 0;
         }
         .editor-preview-side{
             width: calc(50% - 150px);
             top: 50px;
+            word-wrap: break-word;
+        }
+        .editor-preview-side pre{
+            overflow: scroll;
+            padding: 5px;
+        }
+        .editor-preview-side strong{
+            font-weight: 700 !important;
+        }
+        .editor-preview-side li{
+            display: list-item;
+            list-style-type: disc !important;
+        }
+        .editor-preview-side img{
+            -webkit-filter: invert(75%);
+            width: 100%;
+        }
+        .editor-preview-side ul{
+            list-style: circle !important;
+            margin: initial;
+            padding: 0 0 0 40px;
+        }
+        .editor-preview-side>ul{
+            list-style: circle !important;
+            margin: initial;
+            padding: 0 0 0 20px;
         }
         .editor-toolbar{
-            padding-left: 300px;
-            display: none;
+            padding-left: 310px;
         }
         .editor-toolbar .fa-arrows-alt{
             display: none;
-
         }
-        main{
-            font-family: arial;
+        .editor-statusbar{
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 50px;
+            line-height: 50px;
+            padding: 0 10px;
         }
-        /*.fullscreen{*/
-        /*padding-left: 300px !important;*/
-        /*}*/
-
-        /*.CodeMirror.cm-s-paper.CodeMirror-wrap.CodeMirror-sided.CodeMirror-fullscreen{*/
-        /*padding-left: 300px;*/
-        /*box-sizing: border-box;*/
-        /*position: absolute !important;*/
-        /*}*/
-        /*.editor-preview-side.editor-preview-active-side{*/
-        /*padding-left: 300px;*/
-        /*position: absolute !important;*/
-        /*}*/
         @media only screen and (max-width : 992px) {
-            html, .editor-toolbar {
+            body, .editor-toolbar {
                 padding-left: 0;
             }
             .editor-preview-side{
@@ -95,8 +124,7 @@
     </ul>
 </div>
 <main>
-    <textarea id="markdown">
-    </textarea>
+    <textarea id="markdown"></textarea>
     <textarea id="mainarea" style="display: none"></textarea>
 </main>
 <!--JavaScript at end of body for optimized loading-->

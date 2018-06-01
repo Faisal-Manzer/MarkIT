@@ -41,7 +41,7 @@ function createWindow() {
     });
 
     win.loadURL(url.format({
-        pathname: path.join(__dirname, 'util/index.html'),
+        pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));
@@ -139,7 +139,8 @@ function setMenus(){
                   label: 'Open',
                   click(){
                       win.webContents.send('open-new-file', '');
-                  }
+                  },
+                    accelerator: "CmdOrCtrl+O"
                 },
                 {
                     label: 'New File',
