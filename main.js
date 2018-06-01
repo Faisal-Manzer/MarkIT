@@ -1,8 +1,7 @@
 'use strict';
-const {app, BrowserWindow, Menu, globalShortcut, remote} = require('electron');
+const {app, BrowserWindow, Menu, globalShortcut} = require('electron');
 const path = require('path');
 const url = require('url');
-const dialog = require('electron').dialog;
 
 require('electron-reload')(__dirname);
 
@@ -27,8 +26,6 @@ app.on('window-all-closed', () => {
 }
 });
 
-
-
 function createWindow() {
 
     win = new BrowserWindow({
@@ -41,7 +38,7 @@ function createWindow() {
     });
 
     win.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
+        pathname: path.join(__dirname, 'src/index.html'),
         protocol: 'file:',
         slashes: true
     }));
@@ -59,7 +56,7 @@ function createWindow() {
     });
 
     win.on('focus', () => {
-        win.webContents.send('winFocusChanged', '');
+        win.webContents.send('win-focused');
     });
 }
 

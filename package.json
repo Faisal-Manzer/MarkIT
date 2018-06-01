@@ -16,6 +16,7 @@
     "codemirror": "^5.38.0",
     "electron-reload": "^1.2.2",
     "materialize-css": "^1.0.0-rc.1",
+    "mime-types": "^2.1.18",
     "simplemde": "^1.11.2"
   }
 }
